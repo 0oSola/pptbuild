@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>PPT生成工具</title>
+
+  <link type="text/css" rel="stylesheet" media="screen" href="../static/dist/handsontable/dist/handsontable.css">
+  <link rel="stylesheet" media="screen" href="../static/dist/handsontable/demo/js/highlight/styles/github.css">
+  <link type="text/css" rel="stylesheet" href="../static/css/jquery.mCustomScrollbar/jquery.mCustomScrollbar.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/bootstrap/bootstrap.min.css">
+  
+  <link rel="stylesheet" type="text/css" href="../static/css/jQueryTab/jQueryTab.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/jQueryTab/animation.css">
+  <link rel="stylesheet" type="text/css" href="../static/dist/dropify/css/dropify.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../static/css/waitMe/waitMe.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../static/css/font-awesome.min.css"/>
+  
+  <link rel="stylesheet" type="text/css" href="../static/dist/notificationFx/css/normalize.css"/>
+  <link rel="stylesheet" type="text/css" href="../static/dist/notificationFx/css/ns-default.css"/>
+  <link rel="stylesheet" type="text/css" href="../static/dist/notificationFx/css/ns-style-growl.css"/>
+  
+  <link type="text/css" rel="stylesheet" id="mainCss" href="../static/css/layout.css"/>
+  
+  <style type="text/css">
+  	.select{
+		background:#4f90fa;
+	}
+  </style>
+</head>
+
+<body onload="checkFirefoxOrIE();">
+
+<!--引导-->
+<div class="yd-modal">
+	<img src="../static/images/logo_white.png"/>
+</div>
+
+<!--弹出层-->
+<div class="module-zz"></div>
+<div class="module-modal" id="chart-modal">
+	<h5 class="modal-title">请选择您要生成的图表类型</h5>
+    <div class="modal-body">
+        <div id="chart-box" class="chart-list">
+        	<ul>
+            	<li class="chart-build" data-type="column"><span class="chart-item fa fa-bar-chart"></span><span class="chart-name">柱状图</span></li>
+                <li class="chart-build" data-type="area"><span class="chart-item fa fa-area-chart"></span><span class="chart-name">折线图</span></li>
+                <li class="chart-build" data-type="pie"><span class="chart-item fa fa-pie-chart"></span><span class="chart-name">饼图</span></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="modal-footer">
+    	<div class="closeModal" id="closemodalChart">取消</div>
+    </div>
+    
+</div>
+
+<div class="module-modal" id="file-modal">
+	<h5 class="modal-title">提示</h5>
+    <div class="modal-body">
+        <p id="text-msg" class="text-area">检测到你没有上传文件，请先上传excel</p>
+    </div>
+    <div class="modal-footer">
+    	<button class="closeBuild" id="closemodalFile">好的</button>
+    </div>
+</div>
+
+<div class="module-modal" id="delete-modal">
+	<h5 class="modal-title">删除图表</h5>
+    <div class="modal-body">
+        <p class="text-area">是否删除此图表</p>
+    </div>
+    <div class="modal-footer">
+    	<button class="closeModal">取消</button>
+    	<button class="closeBuild" id="SureDeleteChart">确认</button>
+        
+    </div>
+    
+</div>
+
+<div class="module-modal" id="dwPPT-modal">
+	<h5 class="modal-title">生成成功</h5>
+    <div class="modal-body">
+        <p class="text-area">PPT文件已经生成成功</p>
+    </div>
+    <div class="modal-footer">
+    	<button class="closeModal">取消</button>
+    	<a class="closeBuild" id="downloadPPT" download="" href="">开始下载</a>
+    </div>
+    
+</div>
+
+
+<div class ="top-banner">
+	<img class="logo" src="../static/images/logo.png"/>
+    <div class="progress-box">
+    	<span class="step-1 step">上传文件</span>
+        <span class="step-2 step">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;制作图表</span>
+        <span class="step-3 step">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;生成PPT</span>
+    </div>
+</div>
+
+<div class="footer-box">
+	<div class="Center-Container is-Table">  
+      <div class="Table-Cell">  
+        <div class="Center-Block">  
+            <div class="page-box">1/3</div> 
+        </div>  
+      </div>  
+    </div>
+	<div class="step-cz">
+    	<button id="step-left" class="step-button" style="opacity:0">上一步</button>
+		<button id="step-right" class="step-button">下一步</button>
+    </div>
+	
+	
+</div>
+
+<div class="content-box" id="content-box">
+
+        <ul class="tabs" style="display:none">
+            <li><a id="step1-col" href="#step1">上传文件</a></li>
+            <li><a id="step2-col" href="#step2">生成图表</a></li>
+            <li><a id="step3-col" href="#step3">生成PPT</a></li>
+        </ul>
+        
+        <section class="tab_content_wrapper" style="height:100%">
+        	<!--step1--->
+            <article class="tab_content upload-box" id="step1">
+                <div class="Center-Container is-Table">  
+                  <div class="Table-Cell">  
+                    <div class="Center-Block">  
+                         <div class="center-box">
+                            <h3 class="tip-title">上传需要生成PPT的excel文件</h3>
+                            <p class="tip-detail">支持的文件类型有：.xls,xlsx</p>
+                            <form  enctype='multipart/form-data' method='post' action='javascript:;' role = "form" id = "frmUploadFile">
+                                <input type="file" id="sheetData" name="sheetData" class="dropify-fr" data-default-file=""/>
+                                
+                                <button class="upload-btn" id="upload-data">开始上传</button>
+                            </form>
+                            
+                        </div>
+                    </div>  
+                  </div>  
+                </div>
+            </article>
+             <!--step2--->
+            <article class="tab_content" id="step2">
+            	<div class="data-box">
+                	<div class="sheet-box">
+                        <div class="tabs-box">
+                            <div class="menu-box">
+                                <ul class="sheet-tabs">
+                            		
+                                </ul>
+                                <button id="buildChart">生成图表</button>
+                            </div>
+                            <div class="sheet-tabs-content">
+                        		
+                            </div>
+                        </div>
+                         
+                    </div>
+                    <div id="chart-result">
+                        <h5 class="chart-title">我的图库</h5>
+                        <div class="chart-list-box"></div>
+                    </div>
+                    
+                </div>
+            	
+            </article>
+            <!--step3--->
+            <article class="tab_content upload-box" id="step3">
+                <div class="Center-Container is-Table">  
+                  <div class="Table-Cell">  
+                    <div class="Center-Block">  
+                         <div class="center-box">
+                            <h3 class="tip-title">上传PPT模板</h3>
+                            <p class="tip-detail">支持的文件类型有：.ppt,pptx</p>
+                            <form  enctype='multipart/form-data' method='post' action='javascript:;' role = "form" id = "frmUploadPPT">
+                                <input type="file" id="PPTtpl" name="PPTtpl" class="dropify-fr" data-default-file=""/>
+                                
+                                <button class="upload-btn" id="uploadPPT">上传模板</button><span style="margin-left:20px;"><button class="upload-btn" id="buildPPT">生成PPT</button></span>							
+                            </form>
+                            <label style="font-size:12px; font-weight:400;margin-right:10px;">生成的图片背景是否透明</label><input style="margin-top:10px;" checked="checked" id="isTransparent" type="checkbox" name="isTransparent"/>
+                        </div>
+                    </div>  
+                  </div>  
+                </div>
+            </article>
+        </section>
+
+</div>
+
+</body>
+<script type="text/javascript" src="../static/js/jquery/1.11.1/jquery-1.11.1.min.js"></script>
+
+
+<script type="text/javascript">
+function checkFirefoxOrIE(){ 
+	userAgent=window.navigator.userAgent.toLowerCase(); 
+	if(userAgent.indexOf("firefox")>=1){ 
+		//$("#mainCss").attr("href","../static/css/flayout.css");
+		$("<link>")
+		.attr({ rel: "stylesheet",
+			type: "text/css",
+			href: "../static/css/flayout.css"
+		})
+		.appendTo("head");
+	}
+} 
+</script>
+
+<script type="text/javascript" src="../static/js/jQueryTab/jQueryTab.js"></script>
+<script type="text/javascript" src="../static/js/waitMe/waitMe.min.js"></script>
+
+<script type="text/javascript" src="../static/dist/notificationFx/js/modernizr.custom.js"></script>
+<script type="text/javascript" src="../static/dist/notificationFx/js/classie.js"></script>
+<script type="text/javascript" src="../static/dist/notificationFx/js/notificationFx.js"></script>
+
+<script type="text/javascript" src="../static/js/jquery/jquery-ui/jquery-ui-1.11.2.min.js"></script>
+<script type="text/javascript" src="../static/js/jquery.mCustomScrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+<script type="text/javascript" src="../static/dist/handsontable/dist/pikaday/pikaday.js"></script>
+<script type="text/javascript" src="../static/dist/handsontable/dist/moment/moment.js"></script>
+<script type="text/javascript" src="../static/dist/handsontable/dist/zeroclipboard/ZeroClipboard.js"></script>
+<script type="text/javascript" src="../static/dist/handsontable/dist/handsontable.js"></script>
+<script type="text/javascript" src="../static/dist/handsontable/demo/js/highlight/highlight.pack.js"></script>
+
+<script type="text/javascript" src="../static/js/highchart/highcharts.js"></script>
+<script type="text/javascript" src="../static/js/highchart/highcharts-more.js"></script>
+<script type="text/javascript" src="../static/js/echart/echarts.min.js"></script> 
+<script type="text/javascript" src="../static/js/chartList/chart.js"></script>
+
+<script type="text/javascript" src="../static/dist/dropify/js/dropify.min.js"></script>
+
+<script type="text/javascript" src="../static/js/bootstrap/bootstrap.min.js"></script>
+
+
+
+<script type="text/javascript" src="../static/js/sheet.js"></script>
+
+
+
+
+</html>
